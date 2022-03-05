@@ -261,7 +261,7 @@ const getPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
     const user = req.user.email;
-    const query = `SELECT * FROM posts WHERE uid = $1`;
+    const query = `SELECT * FROM posts WHERE uid = $1 ORDER BY created_at ASC`;
     try {
         const data = await pool.query(query, [user]);
         for (const post of data.rows) {
