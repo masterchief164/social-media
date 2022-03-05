@@ -11,7 +11,6 @@ const verifyToken = (req, res, next) => {
     const jwtToken = token.split(' ')[1];
     jwt.verify(jwtToken, process.env.TOKEN_SECRET, {}, (err, user) => {
         if (err) {
-            console.log(err)
             return res.sendStatus(403)
         }
         req.user = user

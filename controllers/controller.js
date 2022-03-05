@@ -14,7 +14,6 @@ const test = async (req, res) => {
 const addUser = async (req, res) => {
     const {name, email, password} = req.body;
     const hash = crypto.createHash('sha256').update(password).digest('hex');
-    console.log(hash);
     const query = `INSERT INTO users (username,email,password) VALUES ('${name}','${email}','${hash}')`;
     try {
         await pool.query(query);
@@ -40,7 +39,6 @@ const authenticate = async (req, res) => {
             });
         }
         user = user.rows[0];
-        console.log(user);
         const hash = crypto.createHash('sha256').update(password).digest('hex');
         if (hash !== user.password) {
             return res.status(401).json({
@@ -64,6 +62,10 @@ const authenticate = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
+        return res.status(500).json({
+            message: 'Unknown error',
+            error: error
+        });
     }
 }
 
@@ -115,14 +117,11 @@ const getUser = async (req, res) => {
     try {
         let followers = await pool.query(query, [userEmail]);
         let following = await pool.query(query2, [userEmail]);
-        console.log(followers.rowCount);
-        console.log(following.rowCount);
         delete user.iat;
         delete user.exp;
         delete user.email;
         user.followingCount = followers.rows.length;
         user.followersCount = following.rows.length;
-        console.log(user)
         return res.status(200).json({
             user: user
         });
@@ -141,9 +140,7 @@ const createPost = async (req, res) => {
     const query = `INSERT INTO posts (title,description,uid) VALUES ('${title}','${description}','${user}')   RETURNING *`;
     try {
         const data = await pool.query(query);
-        console.log(data.rows)
         delete data.rows[0].uid;
-        console.log(data.rows)
         return res.status(200).json({
             message: 'Post added successfully',
             post: data.rows[0]
