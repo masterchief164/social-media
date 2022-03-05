@@ -4,7 +4,7 @@ const verifyToken = require("../middlewares/auth");
 
 const postRouter = express.Router();
 
-postRouter.get('/test', verifyToken, controller.test);
+postRouter.get('/test', controller.test);
 postRouter.post('/addUser', controller.addUser);
 postRouter.post('/authenticate', controller.authenticate);
 postRouter.post('/follow/:following', verifyToken, controller.follow);

@@ -269,6 +269,7 @@ const getAllPosts = async (req, res) => {
         const data = await pool.query(query, [user]);
         for (const post of data.rows) {
             const query1 = `SELECT * FROM comments WHERE pid = $1`;
+            delete post.uid;
             const data1 = await pool.query(query1, [post.pid]);
             const query2 = `SELECT * FROM like_posts WHERE pid = $1`;
             const data2 = await pool.query(query2, [post.pid]);
