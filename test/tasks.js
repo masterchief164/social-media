@@ -27,6 +27,7 @@ describe("Social Media", () => {
     let userId = null;
     let user2Id = null;
     let postId = null;
+    let postId2 = null;
 
     describe("GET /test", () => {
         it("it should GET the test endpoint", (done) => {
@@ -163,7 +164,6 @@ describe("Social Media", () => {
     });
 
     describe("POST /follow", () => {
-        console.log("token", token);
         it("it should follow a user", (done) => {
             chai.request(server)
                 .post(`/api/follow/${user2Id}`)
@@ -205,6 +205,22 @@ describe("Social Media", () => {
         });
     });
 
+    describe("GET /user", () => {
+        it("it should GET a user", (done) => {
+            chai.request(server)
+                .get(`/api/user`)
+                .set('Authorization', `Bearer ${token}`)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('message').eq('User found');
+                    res.body.should.have.property('status').eq(true);
+                    res.body.should.have.property('user');
+                    done();
+                });
+        });
+    });
+
     describe("POST /posts", () => {
         it("it should create a post", (done) => {
             const post = {
@@ -225,6 +241,26 @@ describe("Social Media", () => {
                     done();
                 });
         });
+
+        it("it should create another post", (done) => {
+            const post = {
+                title: "test1",
+                description: "test1"
+            };
+            chai.request(server)
+                .post('/api/posts')
+                .set('Authorization', `Bearer ${token}`)
+                .send(post)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('message').eq('Post created successfully');
+                    res.body.should.have.property('status').eq(true);
+                    res.body.should.have.property('post');
+                    postId2 = res.body.post._id;
+                    done();
+                });
+        });
     });
 
     describe("GET /posts/:id", () => {
@@ -238,6 +274,21 @@ describe("Social Media", () => {
                     res.body.should.have.property('message').eq('Post found');
                     res.body.should.have.property('status').eq(true);
                     res.body.should.have.property('post');
+                    done();
+                });
+        });
+    });
+
+    describe("DELETE /posts/:id", () => {
+        it("it should delete a post", (done) => {
+            chai.request(server)
+                .delete('/api/posts/' + postId2)
+                .set('Authorization', `Bearer ${token}`)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.a('object');
+                    res.body.should.have.property('message').eq('Post deleted successfully');
+                    res.body.should.have.property('status').eq(true);
                     done();
                 });
         });
